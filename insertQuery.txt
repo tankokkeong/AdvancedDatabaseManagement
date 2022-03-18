@@ -1,0 +1,187 @@
+DROP TABLE FacilityBookingRecord;
+DROP TABLE FacilityType;
+DROP TABLE Librarians;
+DROP TABLE ReturnRecord;
+DROP TABLE BorrowDetails;
+DROP TABLE BorrowRecord;
+DROP TABLE Book;
+DROP TABLE Bookshelf;
+DROP TABLE BookPublisher;
+DROP TABLE BookAuthor;
+DROP TABLE BookCategory;
+DROP TABLE Lecturers;
+DROP TABLE Students;
+DROP TABLE Campus;
+DROP TABLE Course;
+DROP TABLE Faculty;
+
+CREATE TABLE bookPublisher(
+  publisherID CHAR(7) NOT NULL,
+  publisherName varchar2(30),
+  publishDate DATE NOT NULL,
+  PRIMARY KEY (publisherID),
+  CONSTRAINT check_publisherID CHECK (REGEXP_LIKE(publisherID, '(BP|bp)[0-9]{4}', 'g'))
+);
+
+CREATE TABLE bookAuthor(
+  authorID CHAR(7) NOT NULL,
+  authorName varchar2(30),
+  PRIMARY KEY (authorID),
+  CONSTRAINT check_authorID CHECK (REGEXP_LIKE(authorID, '(BA|ba)[0-9]{4}', 'g'))
+);
+
+CREATE TABLE BookCategory(
+  BookCategoryID CHAR(7) NOT NULL,
+  BookCategoryName varchar2(30),
+  PRIMARY KEY (BookCategoryID),
+  CONSTRAINT check_bookcat CHECK (REGEXP_LIKE(BookCategoryID, '^BC\d{5}$'))
+);
+
+CREATE TABLE Faculty(
+	FacultyID 	CHAR(7) NOT NULL,
+	FacultyName	VARCHAR2(100),
+	PRIMARY KEY (FacultyID)
+);
+
+CREATE TABLE Campus(
+	CampusID		CHAR(7) NOT NULL,
+	CampusName		VARCHAR(100) NOT NULL,
+	Address	 	VARCHAR (150) NOT NULL,
+	City			VARCHAR (20) NOT NULL,
+	State			VARCHAR (20) NOT NULL,
+	ZipCode		CHAR(5) NOT NULL,
+	PRIMARY KEY (CampusID)
+);
+
+CREATE TABLE Bookshelf(
+  bookshelfID CHAR(7) NOT NULL,
+  facultyID CHAR(7) NOT NULL,
+  campusID CHAR(7) NOT NULL,
+  PRIMARY KEY (bookshelfID),
+  CONSTRAINT check_bookshelfID CHECK (REGEXP_LIKE(bookshelfID, '(BS|bs)[0-9]{4}', 'g')),
+  CONSTRAINT fk_bookshelf_faculty FOREIGN KEY (facultyID) REFERENCES faculty,
+  CONSTRAINT fk_bookshelf_campus FOREIGN KEY (campusID) REFERENCES campus
+);
+
+CREATE TABLE Book (
+  bookID CHAR(7) NOT NULL,
+  bookName varchar2(30),
+  totalQuantity number(4),
+  bookCategoryID CHAR(7) NOT NULL,
+  publisherID CHAR(7) NOT NULL,
+  authorID  CHAR(7) NOT NULL,
+  bookshelfID CHAR(7) NOT NULL,
+  PRIMARY KEY (bookID),
+  CONSTRAINT check_bookID CHECK (REGEXP_LIKE(bookID, '(BK|bk)[0-9]{4}', 'g')),
+  CONSTRAINT fk_books_CatID FOREIGN KEY (bookCategoryID) REFERENCES BookCategory,
+  CONSTRAINT fk_books_publisher FOREIGN KEY (publisherID) REFERENCES BookPublisher,
+  CONSTRAINT fk_books_author FOREIGN KEY (authorID) REFERENCES BookAuthor,
+  CONSTRAINT fk_books_bookshelf FOREIGN KEY (bookshelfID) REFERENCES Bookshelf
+);
+
+CREATE TABLE Course (
+	CourseID 	CHAR(7) NOT NULL,
+	CourseName 		VARCHAR2(50) NOT NULL,
+	CreditHours	Number(1) NOT NULL, 
+	FacultyID	CHAR(7) NOT NULL,
+	PRIMARY KEY (CourseID),
+	CONSTRAINT fk_faculty_id FOREIGN KEY(FacultyID) REFERENCES Faculty(FacultyID)
+);
+
+
+CREATE TABLE Lecturers(
+  LecturerID CHAR(7) NOT NULL,
+  LecturerName VARCHAR2(30) NOT NULL,
+  LecturerEmail VARCHAR2(50) NOT NULL,
+  LecturerGender VARCHAR2(1),
+  LecturerAddress VARCHAR2(100),
+  FacultyID CHAR(7) NOT NULL,
+  PRIMARY KEY (LecturerID),
+  CONSTRAINT fk_lecturers_faculty FOREIGN KEY (FacultyID) REFERENCES Faculty,
+  CONSTRAINT check_lecturer CHECK (REGEXP_LIKE(LecturerID, '^LEC\d{5}$')),
+  CONSTRAINT check_lecName CHECK (REGEXP_LIKE(LecturerName, '^[a-zA-Z]$')),
+  CONSTRAINT check_lecGender CHECK (REGEXP_LIKE(LecturerGender, '^(?:M|F)$'))
+);
+
+CREATE TABLE Students(
+StudentID	CHAR(7) NOT NULL,
+StudentName  VARCHAR2(100) NOT NULL,
+StudentAddress VARCHAR2(100) NOT NULL,
+StudentGender CHAR(1) NOT NULL,
+DateOfBirth DATE NOT NULL,
+StudentStatus VARCHAR(10) NOT NULL,
+CourseID CHAR(7) NOT NULL,
+CampusID CHAR(7) NOT NULL,
+PRIMARY KEY (StudentID),
+CONSTRAINT fk_course_id FOREIGN KEY (CourseID)  REFERENCES Course(CourseID),
+CONSTRAINT fk_campus_id FOREIGN KEY (CampusID) REFERENCES Campus (CampusID)
+);
+
+CREATE TABLE BorrowRecord( 
+	BorrowRecordID	 	CHAR(7) NOT NULL,
+	DateBorrowed	 	DATE NOT NULL,
+	StudentID		 CHAR(7),
+      LecturerID		 CHAR(7),
+	PRIMARY KEY (BorrowRecordID),
+Constraint fk_BorrowRecord_Students FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+Constraint fk_BorrowRecord_Lecturers FOREIGN KEY (LecturerID) REFERENCES Lecturers(LecturerID),
+CONSTRAINT CHK_BR CHECK (REGEXP_LIKE(BorrowRecordID, '^BR\d{5}$'))
+);
+
+CREATE TABLE BorrowDetails(
+	BorrowDetailsID	 	CHAR(7) NOT NULL,
+	Quantity		 NUMBER(6) NOT NULL,
+	BorrowRecordID	 	CHAR(7) NOT NULL,
+        BookID		         CHAR(7) NOT NULL,
+	PRIMARY KEY (BorrowDetailsID),
+Constraint fk_BorrowDetails_BorrowRecord FOREIGN KEY (BorrowRecordID) REFERENCES BorrowRecord(BorrowRecordID),
+Constraint fk_BorrowDetails_Books FOREIGN KEY (BookID) REFERENCES Book(BookID),
+CONSTRAINT CHK_BD CHECK (REGEXP_LIKE(BorrowDetailsID, '^BD\d{5}$')),
+CONSTRAINT CHK_QTY CHECK (Quantity >=1 AND Quantity<=2)
+);
+
+CREATE TABLE ReturnRecord(
+  ReturnRecordID CHAR(7) NOT NULL,
+  DateReturned DATE NOT NULL,
+  Quantity number(4),
+  BorrowRecordID CHAR(7) NOT NULL,
+  BorrowDetailsID CHAR(7) NOT NULL,
+  PRIMARY KEY (ReturnRecordID),
+  CONSTRAINT fk_returnRecord_borrowRecord FOREIGN KEY (BorrowRecordID) REFERENCES BorrowRecord,
+  CONSTRAINT fk_returnRecord_borrowDetails FOREIGN KEY (BorrowDetailsID) REFERENCES BorrowDetails,
+  CONSTRAINT check_records CHECK (REGEXP_LIKE(ReturnRecordID, '^RR\d{5}$'))
+);
+
+CREATE TABLE Librarians(
+	LibrarianID		 CHAR(7) NOT NULL,
+	LibrarianName	 	VARCHAR2(50) NOT NULL,
+	WorkingHours	 	NUMBER(5) NOT NULL,
+	PRIMARY KEY (LibrarianID),
+CONSTRAINT CHK_HOURS CHECK (WorkingHours >=4 AND WorkingHours <=12),
+CONSTRAINT check_LIB CHECK (REGEXP_LIKE(LibrarianID, '^LIB\d{5}$'))
+);
+
+
+CREATE TABLE FacilityType(
+  FacilityID CHAR(7) NOT NULL,
+  FacilityType varchar2(30),
+  PRIMARY KEY (FacilityID),
+  CONSTRAINT check_facilityID CHECK (REGEXP_LIKE(FacilityID, '^FC\d{5}$')),
+  CONSTRAINT check_facilityType CHECK (REGEXP_LIKE(FacilityType, '^[a-zA-Z]$'))	
+);
+
+CREATE TABLE FacilityBookingRecord(
+        FacilityBookingRecordID	 CHAR(7) NOT NULL,
+        DateBooked		             TIMESTAMP NOT NULL,
+        DateCheckout		       TIMESTAMP NOT NULL,
+        LibrarianID		      CHAR(7) NOT NULL,
+        FacilityTypeID		       CHAR(7) NOT NULL,
+        LecturerID		       CHAR(7),
+        StudentID		       CHAR(7),
+	PRIMARY KEY (FacilityBookingRecordID),
+Constraint fk_FacilityBookingRecord_Librarians FOREIGN KEY (LibrarianID) REFERENCES Librarians(LibrarianID),
+Constraint fk_FacilityBookingRecord_FacilityType FOREIGN KEY (FacilityTypeID) REFERENCES FacilityType(FacilityID),
+Constraint fk_FacilityBookingRecord_Lecturer FOREIGN KEY (LecturerID) REFERENCES Lecturers(LecturerID),
+Constraint fk_FacilityBookingRecord_Student FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+CONSTRAINT CHK_FBR CHECK (REGEXP_LIKE(FacilityBookingRecordID, '^FBR\d{5}$'))
+);
