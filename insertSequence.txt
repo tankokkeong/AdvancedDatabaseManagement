@@ -1,0 +1,18 @@
+Insert sequence
+
+BookPublisher
+BookAuthor
+BookCategory
+Campus
+Faculty
+Bookshelf
+Book
+Course
+Lecturers
+Students
+BorrowRecord
+BorrowDetails
+ReturnRecords
+Librarians
+FacilityType
+FacilityBookingRecord
