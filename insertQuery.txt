@@ -157,6 +157,7 @@ CREATE TABLE Librarians(
 	LibrarianName	 	VARCHAR2(50) NOT NULL,
 	WorkingHours	 	NUMBER(5) NOT NULL,
 	PRIMARY KEY (LibrarianID),
+  CONSTRAINT CHK_LIBName CHECK (REGEXP_LIKE(LibrarianName, '^[a-zA-Z ]+$')),
 CONSTRAINT CHK_HOURS CHECK (WorkingHours >=4 AND WorkingHours <=12),
 CONSTRAINT check_LIB CHECK (REGEXP_LIKE(LibrarianID, '^LIB\d{5}$'))
 );
