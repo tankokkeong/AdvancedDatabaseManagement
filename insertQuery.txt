@@ -34,7 +34,7 @@ CREATE TABLE BookCategory(
   BookCategoryID CHAR(7) NOT NULL,
   BookCategoryName varchar2(30),
   PRIMARY KEY (BookCategoryID),
-  CONSTRAINT check_bookcat CHECK (REGEXP_LIKE(BookCategoryID, '^BC\d{5}$'))
+  CONSTRAINT check_bookcat CHECK (REGEXP_LIKE(BookCategoryID, '^BKC\d{4}$'))
 );
 
 CREATE TABLE Faculty(
@@ -98,7 +98,7 @@ CREATE TABLE Lecturers(
   FacultyID CHAR(7) NOT NULL,
   PRIMARY KEY (LecturerID),
   CONSTRAINT fk_lecturers_faculty FOREIGN KEY (FacultyID) REFERENCES Faculty,
-  CONSTRAINT check_lecturer CHECK (REGEXP_LIKE(LecturerID, '^LEC\d{5}$')),
+  CONSTRAINT check_lecturer CHECK (REGEXP_LIKE(LecturerID, '^LEC\d{4}$')),
   CONSTRAINT check_lecName CHECK (REGEXP_LIKE(LecturerName, '^[a-zA-Z]$')),
   CONSTRAINT check_lecGender CHECK (REGEXP_LIKE(LecturerGender, '^(?:M|F)$'))
 );
@@ -149,7 +149,7 @@ CREATE TABLE ReturnRecord(
   PRIMARY KEY (ReturnRecordID),
   CONSTRAINT fk_returnRecord_borrowRecord FOREIGN KEY (BorrowRecordID) REFERENCES BorrowRecord,
   CONSTRAINT fk_returnRecord_borrowDetails FOREIGN KEY (BorrowDetailsID) REFERENCES BorrowDetails,
-  CONSTRAINT check_records CHECK (REGEXP_LIKE(ReturnRecordID, '^RR\d{5}$'))
+  CONSTRAINT check_records CHECK (REGEXP_LIKE(ReturnRecordID, '^RTR\d{4}$'))
 );
 
 CREATE TABLE Librarians(
@@ -166,7 +166,7 @@ CREATE TABLE FacilityType(
   FacilityID CHAR(7) NOT NULL,
   FacilityType varchar2(30),
   PRIMARY KEY (FacilityID),
-  CONSTRAINT check_facilityID CHECK (REGEXP_LIKE(FacilityID, '^FC\d{5}$')),
+  CONSTRAINT check_facilityID CHECK (REGEXP_LIKE(FacilityID, '^FCT\d{4}$')),
   CONSTRAINT check_facilityType CHECK (REGEXP_LIKE(FacilityType, '^[a-zA-Z]$'))	
 );
 
