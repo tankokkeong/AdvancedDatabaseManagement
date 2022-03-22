@@ -32,7 +32,7 @@ CREATE TABLE bookAuthor(
 
 CREATE TABLE BookCategory(
   BookCategoryID CHAR(7) NOT NULL,
-  BookCategoryName varchar2(30),
+  BookCategoryName varchar2(100),
   PRIMARY KEY (BookCategoryID),
   CONSTRAINT check_bookcat CHECK (REGEXP_LIKE(BookCategoryID, '^BKC\d{4}$'))
 );
@@ -100,9 +100,7 @@ CREATE TABLE Lecturers(
   PRIMARY KEY (LecturerID),
   CONSTRAINT fk_lecturers_faculty FOREIGN KEY (FacultyID) REFERENCES Faculty,
   CONSTRAINT fk_lecturers_campus FOREIGN KEY (CampusID) REFERENCES Campus (CampusID),
-  CONSTRAINT check_lecturer CHECK (REGEXP_LIKE(LecturerID, '^LEC\d{4}$')),
-  CONSTRAINT check_lecName CHECK (REGEXP_LIKE(LecturerName, '^[a-zA-Z]$')),
-  CONSTRAINT check_lecGender CHECK (REGEXP_LIKE(LecturerGender, '^(?:M|F)$'))
+  CONSTRAINT check_lecturer CHECK (REGEXP_LIKE(LecturerID, '^LEC\d{4}$'))
 );
 
 CREATE TABLE Students(
@@ -166,10 +164,9 @@ CONSTRAINT CHK_LIB CHECK (REGEXP_LIKE(LibrarianID, '^LIB\d{4}$'))
 
 CREATE TABLE FacilityType(
   FacilityID CHAR(7) NOT NULL,
-  FacilityType varchar2(30),
+  FacilityType varchar2(100),
   PRIMARY KEY (FacilityID),
-  CONSTRAINT check_facilityID CHECK (REGEXP_LIKE(FacilityID, '^FCT\d{4}$')),
-  CONSTRAINT check_facilityType CHECK (REGEXP_LIKE(FacilityType, '^[a-zA-Z]$'))	
+  CONSTRAINT check_facilityID CHECK (REGEXP_LIKE(FacilityID, '^FCT\d{4}$'))
 );
 
 CREATE TABLE FacilityBookingRecord(
