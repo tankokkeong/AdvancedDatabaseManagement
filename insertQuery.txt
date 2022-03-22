@@ -20,14 +20,14 @@ CREATE TABLE bookPublisher(
   publisherName varchar2(30),
   publishDate DATE NOT NULL,
   PRIMARY KEY (publisherID),
-  CONSTRAINT check_publisherID CHECK (REGEXP_LIKE(publisherID, '(BKP)[0-9]{4}', 'g'))
+  CONSTRAINT check_publisherID CHECK (REGEXP_LIKE(publisherID, '^BKP\d{4}$'))
 );
 
 CREATE TABLE bookAuthor(
   authorID CHAR(7) NOT NULL,
   authorName varchar2(30),
   PRIMARY KEY (authorID),
-  CONSTRAINT check_authorID CHECK (REGEXP_LIKE(authorID, '(BKA)[0-9]{4}', 'g'))
+  CONSTRAINT check_authorID CHECK (REGEXP_LIKE(authorID, '^BKA\d{4}$'))
 );
 
 CREATE TABLE BookCategory(
@@ -58,7 +58,7 @@ CREATE TABLE Bookshelf(
   facultyID CHAR(7) NOT NULL,
   campusID CHAR(7) NOT NULL,
   PRIMARY KEY (bookshelfID),
-  CONSTRAINT check_bookshelfID CHECK (REGEXP_LIKE(bookshelfID, '(BKS)[0-9]{4}', 'g')),
+  CONSTRAINT check_bookshelfID CHECK (REGEXP_LIKE(bookshelfID, '^BKS\d{4}$')),
   CONSTRAINT fk_bookshelf_faculty FOREIGN KEY (facultyID) REFERENCES faculty,
   CONSTRAINT fk_bookshelf_campus FOREIGN KEY (campusID) REFERENCES campus
 );
@@ -72,7 +72,7 @@ CREATE TABLE Book (
   authorID  CHAR(7) NOT NULL,
   bookshelfID CHAR(7) NOT NULL,
   PRIMARY KEY (bookID),
-  CONSTRAINT check_bookID CHECK (REGEXP_LIKE(bookID, '(BOK)[0-9]{4}', 'g')),
+  CONSTRAINT check_bookID CHECK (REGEXP_LIKE(bookID, '^BOK\d{4}$')),
   CONSTRAINT fk_books_CatID FOREIGN KEY (bookCategoryID) REFERENCES BookCategory,
   CONSTRAINT fk_books_publisher FOREIGN KEY (publisherID) REFERENCES BookPublisher,
   CONSTRAINT fk_books_author FOREIGN KEY (authorID) REFERENCES BookAuthor,
