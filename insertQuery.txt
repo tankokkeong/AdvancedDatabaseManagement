@@ -96,8 +96,10 @@ CREATE TABLE Lecturers(
   LecturerGender VARCHAR2(1),
   LecturerAddress VARCHAR2(100),
   FacultyID CHAR(7) NOT NULL,
+  CampusID CHAR(7) NOT NULL,
   PRIMARY KEY (LecturerID),
   CONSTRAINT fk_lecturers_faculty FOREIGN KEY (FacultyID) REFERENCES Faculty,
+  CONSTRAINT fk_lecturers_campus FOREIGN KEY (CampusID) REFERENCES Campus (CampusID),
   CONSTRAINT check_lecturer CHECK (REGEXP_LIKE(LecturerID, '^LEC\d{4}$')),
   CONSTRAINT check_lecName CHECK (REGEXP_LIKE(LecturerName, '^[a-zA-Z]$')),
   CONSTRAINT check_lecGender CHECK (REGEXP_LIKE(LecturerGender, '^(?:M|F)$'))
