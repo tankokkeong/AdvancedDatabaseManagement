@@ -38,18 +38,18 @@ CREATE TABLE BookCategory(
 );
 
 CREATE TABLE Faculty(
-	FacultyID 	CHAR(7) NOT NULL,
-	FacultyName	VARCHAR2(100),
+	FacultyID CHAR(7) NOT NULL,
+	FacultyName VARCHAR2(100),
 	PRIMARY KEY (FacultyID)
 );
 
 CREATE TABLE Campus(
-	CampusID		CHAR(7) NOT NULL,
-	CampusName		VARCHAR(100) NOT NULL,
-	Address	 	VARCHAR (150) NOT NULL,
-	City			VARCHAR (20) NOT NULL,
-	State			VARCHAR (20) NOT NULL,
-	ZipCode		CHAR(5) NOT NULL,
+	CampusID CHAR(7) NOT NULL,
+	CampusName VARCHAR(100) NOT NULL,
+	Address VARCHAR (150) NOT NULL,
+	City VARCHAR (20) NOT NULL,
+	State VARCHAR (20) NOT NULL,
+	ZipCode CHAR(5) NOT NULL,
 	PRIMARY KEY (CampusID)
 );
 
@@ -80,10 +80,10 @@ CREATE TABLE Book (
 );
 
 CREATE TABLE Course (
-	CourseID 	CHAR(7) NOT NULL,
-	CourseName 		VARCHAR2(50) NOT NULL,
-	CreditHours	Number(1) NOT NULL, 
-	FacultyID	CHAR(7) NOT NULL,
+	CourseID CHAR(7) NOT NULL,
+	CourseName VARCHAR2(50) NOT NULL,
+	CreditHours Number(1) NOT NULL, 
+	FacultyID CHAR(7) NOT NULL,
 	PRIMARY KEY (CourseID),
 	CONSTRAINT fk_faculty_id FOREIGN KEY(FacultyID) REFERENCES Faculty(FacultyID)
 );
@@ -106,8 +106,8 @@ CREATE TABLE Lecturers(
 );
 
 CREATE TABLE Students(
-StudentID	CHAR(7) NOT NULL,
-StudentName  VARCHAR2(100) NOT NULL,
+StudentID CHAR(7) NOT NULL,
+StudentName VARCHAR2(100) NOT NULL,
 StudentAddress VARCHAR2(100) NOT NULL,
 StudentGender CHAR(1) NOT NULL,
 DateOfBirth DATE NOT NULL,
@@ -120,10 +120,10 @@ CONSTRAINT fk_campus_id FOREIGN KEY (CampusID) REFERENCES Campus (CampusID)
 );
 
 CREATE TABLE BorrowRecord( 
-	BorrowRecordID	 	CHAR(7) NOT NULL,
-	DateBorrowed	 	DATE NOT NULL,
-	StudentID		 CHAR(7),
-      LecturerID		 CHAR(7),
+	BorrowRecordID CHAR(7) NOT NULL,
+	DateBorrowed DATE NOT NULL,
+	StudentID CHAR(7),
+  LecturerID CHAR(7),
 	PRIMARY KEY (BorrowRecordID),
 Constraint fk_BorrowRecord_Students FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
 Constraint fk_BorrowRecord_Lecturers FOREIGN KEY (LecturerID) REFERENCES Lecturers(LecturerID),
@@ -131,10 +131,10 @@ CONSTRAINT CHK_BR CHECK (REGEXP_LIKE(BorrowRecordID, '^BRD\d{4}$'))
 );
 
 CREATE TABLE BorrowDetails(
-	BorrowDetailsID	  	CHAR(7) NOT NULL,
-	Quantity		  NUMBER(6) NOT NULL,
-	BorrowRecordID	  	CHAR(7) NOT NULL,
-        BookID		          CHAR(7) NOT NULL,
+	BorrowDetailsID CHAR(7) NOT NULL,
+	Quantity NUMBER(6) NOT NULL,
+	BorrowRecordID CHAR(7) NOT NULL,
+  BookID CHAR(7) NOT NULL,
 	PRIMARY KEY (BorrowDetailsID),
 Constraint fk_BorrowDetails_BorrowRecord FOREIGN KEY (BorrowRecordID) REFERENCES BorrowRecord(BorrowRecordID),
 Constraint fk_BorrowDetails_Books FOREIGN KEY (BookID) REFERENCES Book(BookID),
