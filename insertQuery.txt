@@ -130,14 +130,12 @@ CONSTRAINT CHK_BR CHECK (REGEXP_LIKE(BorrowRecordID, '^BRD\d{4}$'))
 
 CREATE TABLE BorrowDetails(
 	BorrowDetailsID CHAR(7) NOT NULL,
-	Quantity NUMBER(6) NOT NULL,
 	BorrowRecordID CHAR(7) NOT NULL,
   BookID CHAR(7) NOT NULL,
 	PRIMARY KEY (BorrowDetailsID),
 Constraint fk_BorrowDetails_BorrowRecord FOREIGN KEY (BorrowRecordID) REFERENCES BorrowRecord(BorrowRecordID),
 Constraint fk_BorrowDetails_Books FOREIGN KEY (BookID) REFERENCES Book(BookID),
-CONSTRAINT CHK_BD CHECK (REGEXP_LIKE(BorrowDetailsID, '^BDS\d{4}$')),
-CONSTRAINT CHK_QTY CHECK (Quantity >=1 AND Quantity<=2)
+CONSTRAINT CHK_BD CHECK (REGEXP_LIKE(BorrowDetailsID, '^BDS\d{4}$'))
 );
 
 CREATE TABLE ReturnRecord(
