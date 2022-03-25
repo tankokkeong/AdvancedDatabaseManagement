@@ -57,11 +57,11 @@ CREATE TABLE Campus(
 
 CREATE TABLE Bookshelf(
   bookshelfID CHAR(7) NOT NULL,
-  facultyID CHAR(7) NOT NULL,
   campusID CHAR(7) NOT NULL,
+  bookCategoryID CHAR(7) NOT NULL,
   PRIMARY KEY (bookshelfID),
   CONSTRAINT check_bookshelfID CHECK (REGEXP_LIKE(bookshelfID, '^BKS\d{4}$')),
-  CONSTRAINT fk_bookshelf_faculty FOREIGN KEY (facultyID) REFERENCES faculty,
+  CONSTRAINT fk_bookshelf_bookCategory FOREIGN KEY (bookCategoryID) REFERENCES BookCategory,
   CONSTRAINT fk_bookshelf_campus FOREIGN KEY (campusID) REFERENCES campus
 );
 
