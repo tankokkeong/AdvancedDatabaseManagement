@@ -141,7 +141,6 @@ CONSTRAINT CHK_BD CHECK (REGEXP_LIKE(BorrowDetailsID, '^BDS\d{4}$'))
 CREATE TABLE ReturnRecord(
   ReturnRecordID CHAR(7) NOT NULL,
   DateReturned DATE NOT NULL,
-  Quantity number(4),
   BorrowRecordID CHAR(7) NOT NULL,
   BorrowDetailsID CHAR(7) NOT NULL,
   PRIMARY KEY (ReturnRecordID),
