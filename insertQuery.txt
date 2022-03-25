@@ -1,3 +1,4 @@
+DROP TABLE FacilityBookingDetails;
 DROP TABLE FacilityBookingRecord;
 DROP TABLE Facility;
 DROP TABLE FacilityType;
@@ -188,5 +189,17 @@ Constraint fk_FacilityBookingRecord_Librarians FOREIGN KEY (LibrarianID) REFEREN
 Constraint fk_FacilityBookingRecord_Facility FOREIGN KEY (FacilityID) REFERENCES Facility(FacilityID),
 Constraint fk_FacilityBookingRecord_Lecturer FOREIGN KEY (LecturerID) REFERENCES Lecturers(LecturerID),
 Constraint fk_FacilityBookingRecord_Student FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+CONSTRAINT CHK_FBR CHECK (REGEXP_LIKE(FacilityBookingRecordID, '^FBR\d{4}$'))
+);
+
+CREATE TABLE FacilityBookingDetails(
+        FacilityBookingDetailsID	  CHAR(7) NOT NULL,
+        FacilityBookingID		        CHAR(7) NOT NULL,
+        StudentID		        CHAR(7),
+        LecturerID		        CHAR(7),
+PRIMARY KEY (FacilityBookingRecordID),
+Constraint fk_FacilityBookingDetails_FacilityBookingRecord FOREIGN KEY (FacilityBookingID) REFERENCES FacilityBookingRecord(FacilityBookingRecordID),
+Constraint fk_FacilityBookingDetails_Lecturer FOREIGN KEY (LecturerID) REFERENCES Lecturers(LecturerID),
+Constraint fk_FacilityBookingDetails_Student FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
 CONSTRAINT CHK_FBR CHECK (REGEXP_LIKE(FacilityBookingRecordID, '^FBR\d{4}$'))
 );
