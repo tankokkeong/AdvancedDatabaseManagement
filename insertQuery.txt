@@ -197,9 +197,9 @@ CREATE TABLE FacilityBookingDetails(
         FacilityBookingID		        CHAR(7) NOT NULL,
         StudentID		        CHAR(7),
         LecturerID		        CHAR(7),
-PRIMARY KEY (FacilityBookingRecordID),
+PRIMARY KEY (FacilityBookingDetailsID),
 Constraint fk_FacilityBookingDetails_FacilityBookingRecord FOREIGN KEY (FacilityBookingID) REFERENCES FacilityBookingRecord(FacilityBookingRecordID),
 Constraint fk_FacilityBookingDetails_Lecturer FOREIGN KEY (LecturerID) REFERENCES Lecturers(LecturerID),
 Constraint fk_FacilityBookingDetails_Student FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
-CONSTRAINT CHK_FBR CHECK (REGEXP_LIKE(FacilityBookingRecordID, '^FBR\d{4}$'))
+CONSTRAINT CHK_FBD CHECK (REGEXP_LIKE(FacilityBookingDetailsID, '^FBD\d{4}$'))
 );
