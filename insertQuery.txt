@@ -159,10 +159,10 @@ CONSTRAINT CHK_LIB CHECK (REGEXP_LIKE(LibrarianID, '^LIB\d{4}$'))
 );
 
 CREATE TABLE FacilityType(
-  FacilityTID CHAR(7) NOT NULL,
-  FacilityType varchar2(100),
-  PRIMARY KEY (FacilityID),
-  CONSTRAINT check_facilityID CHECK (REGEXP_LIKE(FacilityID, '^FCT\d{4}$'))
+  FacilityTypeID CHAR(7) NOT NULL,
+  FacilityTypeName varchar2(100),
+  PRIMARY KEY (FacilityTypeID),
+  CONSTRAINT check_facilityID CHECK (REGEXP_LIKE(FacilityTypeID, '^FCT\d{4}$'))
 );
 
 CREATE TABLE Facility (
