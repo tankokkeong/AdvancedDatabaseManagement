@@ -1,4 +1,5 @@
 DROP TABLE FacilityBookingRecord;
+DROP TABLE Facility;
 DROP TABLE FacilityType;
 DROP TABLE Librarians;
 DROP TABLE ReturnRecord;
@@ -162,7 +163,7 @@ CREATE TABLE FacilityType(
   FacilityTypeID CHAR(7) NOT NULL,
   FacilityTypeName varchar2(100),
   PRIMARY KEY (FacilityTypeID),
-  CONSTRAINT check_facilityID CHECK (REGEXP_LIKE(FacilityTypeID, '^FCT\d{4}$'))
+  CONSTRAINT check_facilityTypeID CHECK (REGEXP_LIKE(FacilityTypeID, '^FCT\d{4}$'))
 );
 
 CREATE TABLE Facility (
@@ -184,7 +185,7 @@ CREATE TABLE FacilityBookingRecord(
         LecturerID		        CHAR(7),
 PRIMARY KEY (FacilityBookingRecordID),
 Constraint fk_FacilityBookingRecord_Librarians FOREIGN KEY (LibrarianID) REFERENCES Librarians(LibrarianID),
-Constraint fk_FacilityBookingRecord_FacilityType FOREIGN KEY (FacilityID) REFERENCES Facility(FacilityID),
+Constraint fk_FacilityBookingRecord_Facility FOREIGN KEY (FacilityID) REFERENCES Facility(FacilityID),
 Constraint fk_FacilityBookingRecord_Lecturer FOREIGN KEY (LecturerID) REFERENCES Lecturers(LecturerID),
 Constraint fk_FacilityBookingRecord_Student FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
 CONSTRAINT CHK_FBR CHECK (REGEXP_LIKE(FacilityBookingRecordID, '^FBR\d{4}$'))
