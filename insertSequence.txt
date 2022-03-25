@@ -15,4 +15,5 @@ BorrowDetails
 ReturnRecords
 Librarians
 FacilityType
+Facility
 FacilityBookingRecord
