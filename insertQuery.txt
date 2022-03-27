@@ -180,6 +180,7 @@ CREATE TABLE FacilityBookingRecord(
         FacilityBookingRecordID	  CHAR(7) NOT NULL,
         DateBooked		              TIMESTAMP NOT NULL,
         DateCheckout		        TIMESTAMP NOT NULL,
+        DurationHours        NUMBER(1) NOT NULL,
         LibrarianID		       CHAR(7) NOT NULL,
         FacilityID		        CHAR(7) NOT NULL,
         StudentID		        CHAR(7),
