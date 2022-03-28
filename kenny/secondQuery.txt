@@ -1,0 +1,33 @@
+--FORMATTING 
+SET LINESIZE 200
+SET PAGESIZE 200
+
+COLUMN FacilityTypeName FORMAT A60        HEADING "Facility Type"
+COLUMN Room FORMAT A10       HEADING "Room No"
+COLUMN hoursUsed FORMAT 9999	HEADING "Hours Used"
+
+PROMPT 1)Discussion Room
+PROMPT 2)Discussion Room with PC
+PROMPT 3)Presentation Room(With LCD Projector and Whiteboard)
+PROMPT
+
+ACCEPT selection NUMBER FORMAT 9 PROMPT 'Pick Your Option (1-3): '
+ACCEPT month_input NUMBER FORMAT 99 PROMPT 'Enter the month (1-12): '
+ACCEPT year_input NUMBER FORMAT 9999 PROMPT 'Enter the year (eg. 2020): '
+
+TTITLE LEFT 'Facilities Hours Used ' SKIP 2
+
+SELECT DISTINCT fc.Room, fctype.FacilityTypeName, SUM(fr.DurationHours) AS hoursUsed
+FROM FacilityType fctype, Facility fc, FacilityBookingRecord fr
+WHERE fctype.FacilityTypeID = fc.FacilityTypeID AND
+fc.FacilityTypeID = (CASE WHEN &selection = 1 THEN 'FCT0001' 
+WHEN &selection = 2 THEN 'FCT0002'
+WHEN &selection = 3 THEN 'FCT0003'
+ELSE fc.FacilityTypeID END) AND
+fc.FacilityID = fr.FacilityID AND
+TO_CHAR(DateBooked, 'MM-YY') = TO_CHAR(TO_DATE('&month_input-&year_input','MM-YY','NLS_DATE_LANGUAGE = American'), 'MM-YY')
+GROUP BY(fc.Room, fctype.FacilityTypeName);
+
+--CLEAR FORMATTING
+CLEAR COLUMNS
+TTITLE OFF

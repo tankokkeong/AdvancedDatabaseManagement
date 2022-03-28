@@ -1,0 +1,23 @@
+--FORMATTING 
+SET LINESIZE 200
+SET PAGESIZE 200
+
+COLUMN FacilityTypeName FORMAT A60        HEADING "Facility Type"
+COLUMN Room FORMAT A10       HEADING "Room No"
+COLUMN hoursUsed FORMAT 9999	HEADING "Hours Used"
+
+ACCEPT year_input NUMBER FORMAT 9999 PROMPT 'Enter the year (eg. 2020): '
+
+TTITLE LEFT 'Facilities Hours Used ' SKIP 2
+
+SELECT fctype.FacilityTypeName, SUM(fr.DurationHours) AS hoursUsed
+FROM FacilityType fctype, Facility fc, FacilityBookingRecord fr
+WHERE fctype.FacilityTypeID = fc.FacilityTypeID AND
+fc.FacilityID = fr.FacilityID AND
+TO_CHAR(DateBooked, 'YY') = TO_CHAR(TO_DATE('&year_input','YY','NLS_DATE_LANGUAGE = American'), 'YY')
+GROUP BY(fctype.FacilityTypeName)
+ORDER BY(hoursUsed) DESC;
+
+--CLEAR FORMATTING
+CLEAR COLUMNS
+TTITLE OFF
