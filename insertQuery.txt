@@ -143,10 +143,8 @@ CREATE TABLE ReturnRecord(
   ReturnRecordID CHAR(7) NOT NULL,
   DateReturned DATE NOT NULL,
   BorrowRecordID CHAR(7) NOT NULL,
-  BorrowDetailsID CHAR(7) NOT NULL,
   PRIMARY KEY (ReturnRecordID),
   CONSTRAINT fk_returnRecord_borrowRecord FOREIGN KEY (BorrowRecordID) REFERENCES BorrowRecord,
-  CONSTRAINT fk_returnRecord_borrowDetails FOREIGN KEY (BorrowDetailsID) REFERENCES BorrowDetails,
   CONSTRAINT check_records CHECK (REGEXP_LIKE(ReturnRecordID, '^RTR\d{4}$'))
 );
 
