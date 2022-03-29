@@ -68,7 +68,6 @@ CREATE TABLE Bookshelf(
 CREATE TABLE Book (
   bookID CHAR(7) NOT NULL,
   bookName varchar2(30),
-  totalQuantity number(4),
   bookCategoryID CHAR(7) NOT NULL,
   publisherID CHAR(7) NOT NULL,
   authorID  CHAR(7) NOT NULL,
