@@ -1,0 +1,29 @@
+-- Formatting 
+SET linesize 800
+SET pagesize 30
+
+COLUMN StudentID FORMAT A10 HEADING "Student ID"
+COLUMN StudentName FORMAT A30 HEADING "Student Name"
+COLUMN BorrowRecordID FORMAT A10 HEADING "Borrow ID"
+COLUMN DateBorrowed FORMAT A15 HEADING "Borrow At"
+COLUMN DATESHOULDRETURN FORMAT A20 HEADING "Should Return At"
+COLUMN DateReturned FORMAT A15 HEADING "Return At"
+COLUMN LATEDAY FORMAT 9999 HEADING "Late (Days)"
+
+TTITLE LEFT 'Late Returned Students' SKIP 2
+
+ACCEPT month_input NUMBER FORMAT 99 PROMPT 'Enter the month (1-12): '
+ACCEPT year_input NUMBER FORMAT 9999 PROMPT 'Enter the year (eg. 2020): '
+
+SELECT std.StudentID, std.StudentName, brd.BorrowRecordID, brd.DateBorrowed, (brd.DateBorrowed + 14) AS DATESHOULDRETURN , rtr.DateReturned, (DateReturned - (brd.DateBorrowed + 14)) AS LATEDAY
+FROM Students std, BorrowRecord brd, ReturnRecord rtr
+WHERE std.StudentID = brd.StudentID
+AND brd.BorrowRecordID = rtr.BorrowRecordID
+AND EXTRACT(month from rtr.DateReturned) = &month_input
+AND EXTRACT(year from rtr.DateReturned) = &year_input
+AND (rtr.DateReturned - brd.DateBorrowed) > 14
+Order By LATEDAY desc;
+
+-- Clear Formatting
+Clear Columns
+TTITLE OFF

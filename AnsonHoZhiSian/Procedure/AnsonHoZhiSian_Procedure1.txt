@@ -1,0 +1,64 @@
+CREATE TABLE FACILITY_AUDIT
+(
+IN_FACILTY_ID CHAR(13),
+IN_FACILITY_NAME VARCHAR2(16),
+IN_FACILITY_TYPE VARCHAR(60),
+IN_HOURS_USED NUMBER,
+IN_MAINTENANCE_NEED VARCHAR2(21),
+CHECK_BY VARCHAR2(30),
+DATE_CHECK DATE
+);
+
+CREATE OR REPLACE PROCEDURE PRC_CHK_FAC (IN_FACILITY_ID IN CHAR) AS
+
+v_facility_name varchar2(100);
+v_facility_type varchar2(100);
+v_hoursFacility_used Number;
+v_maintenance_needed varchar2(10); 
+v_year varchar2(10);
+v_month varchar2(10);
+
+BEGIN 
+
+SELECT FCL.Room, FCT.FacilityTypeName, SUM(fbr.DurationHours) INTO v_facility_name, v_facility_type, v_hoursFacility_used
+FROM Facility FCL, FacilityType FCT, FacilityBookingRecord fbr
+WHERE FCL.FacilityID = IN_FACILITY_ID
+AND FCL.FacilityTypeID = FCT.FacilityTypeID
+AND FCL.FacilityID = fbr.FacilityID
+AND EXTRACT(year from fbr.DateBooked) = EXTRACT(year from SYSDATE)
+AND EXTRACT(month from fbr.DateBooked) = EXTRACT(month from SYSDATE)
+Group by FCL.Room, FCT.FacilityTypeName;
+
+v_year := TO_CHAR(sysdate, 'YYYY');
+v_month := TO_CHAR(sysdate, 'Month');
+
+IF v_hoursFacility_used > 10 THEN
+v_maintenance_needed := 'Yes';
+-- Insert into Audit Table
+INSERT INTO FACILITY_AUDIT VALUES (IN_FACILITY_ID, v_facility_name, v_facility_type, v_hoursFacility_used, v_maintenance_needed, USER, SYSDATE);
+
+DBMS_OUTPUT.PUT_LINE('Current Year: '||v_year);
+DBMS_OUTPUT.PUT_LINE('Current Month: '||v_month);
+DBMS_OUTPUT.PUT_LINE('Facility ID: '||IN_FACILITY_ID);
+DBMS_OUTPUT.PUT_LINE('Room: '||v_facility_name);
+DBMS_OUTPUT.PUT_LINE('Facility Type: '||v_facility_type);
+DBMS_OUTPUT.PUT_LINE('Hours Used: '||v_hoursFacility_used);
+DBMS_OUTPUT.PUT_LINE('Need to check for maintenance ? : '||v_maintenance_needed);
+
+ELSIF v_hoursFacility_used < 10 THEN
+v_maintenance_needed := 'No';
+-- Insert into Audit Table
+INSERT INTO FACILITY_AUDIT VALUES (IN_FACILITY_ID, v_facility_name, v_facility_type, v_hoursFacility_used, v_maintenance_needed, USER, SYSDATE);
+
+DBMS_OUTPUT.PUT_LINE('Current Year: '||v_year);
+DBMS_OUTPUT.PUT_LINE('Current Month: '||v_month);
+DBMS_OUTPUT.PUT_LINE('Facility ID: '||IN_FACILITY_ID);
+DBMS_OUTPUT.PUT_LINE('Room: '||v_facility_name);
+DBMS_OUTPUT.PUT_LINE('Facility Type: '||v_facility_type);
+DBMS_OUTPUT.PUT_LINE('Hours Used: '||v_hoursFacility_used);
+DBMS_OUTPUT.PUT_LINE('Need to check for maintenance ? : '||v_maintenance_needed);
+
+END IF;
+
+END;
+/

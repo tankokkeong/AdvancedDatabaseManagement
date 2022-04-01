@@ -1,0 +1,49 @@
+set serveroutput on
+
+CREATE OR REPLACE PROCEDURE prc_fac_sum (v_year IN varchar) IS
+
+v_FacilityID FACILITY.FacilityID%TYPE;
+v_Room FACILITY.Room%TYPE;
+v_FacilityType FacilityType.FacilityTypeName%TYPE;
+v_totalBooked NUMBER;
+v_popular VARCHAR2(15);
+
+CURSOR FACBOOK_CURSOR IS
+    SELECT fac.FacilityID, fac.Room, fct.FacilityTypeName, COUNT(fbd.FacilityBookingDetailsID)
+    FROM Facility fac, FacilityType fct, FacilityBookingRecord fbr, FacilityBookingDetails fbd
+    WHERE fct.FacilityTypeID = fac.FacilityTypeID
+    AND fac.FacilityID = fbr.FacilityID
+    AND fbr.FacilityBookingRecordID = fbd.FacilityBookingID
+    AND EXTRACT(year FROM fbr.DateBooked) = v_year
+    GROUP BY fac.FacilityID, fac.Room, fct.FacilityTypeName;
+
+BEGIN
+DBMS_OUTPUT.PUT_LINE('==================================');
+DBMS_OUTPUT.PUT_LINE('TOTAL FACILITY BOOKED IN YEAR '||v_year);
+DBMS_OUTPUT.PUT_LINE('==================================');
+DBMS_OUTPUT.PUT_LINE(CHR(10));
+
+OPEN FACBOOK_CURSOR;
+LOOP
+    FETCH FACBOOK_CURSOR INTO
+        v_FacilityID, v_Room, v_FacilityType, v_totalBooked;
+    EXIT WHEN FACBOOK_CURSOR%NOTFOUND;
+
+IF v_totalBooked > 120 THEN
+    v_popular := ' (MOST POPULAR)';
+ELSE
+    v_popular :=' ';
+END IF;
+DBMS_OUTPUT.PUT_LINE('======================================================================');
+DBMS_OUTPUT.PUT_LINE('FACILITY ID : '||v_FacilityID||v_popular);
+DBMS_OUTPUT.PUT_LINE('ROOM : '||v_Room);
+DBMS_OUTPUT.PUT_LINE('FACILITY TYPE : '||v_FacilityType);
+DBMS_OUTPUT.PUT_LINE('TOTAL BOOKED IN THE YEAR: '||v_totalBooked);
+DBMS_OUTPUT.PUT_LINE('======================================================================');
+END LOOP;
+
+DBMS_OUTPUT.PUT_LINE(CHR(10));
+DBMS_OUTPUT.PUT_LINE('---------------------------- END OF REPORT ---------------------------');
+CLOSE FACBOOK_CURSOR;
+END;
+/

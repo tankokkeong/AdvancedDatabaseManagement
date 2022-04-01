@@ -1,0 +1,130 @@
+SET SERVEROUTPUT ON
+
+CREATE OR REPLACE PROCEDURE prc_std_detail (v_stdID IN CHAR) IS
+
+v_studentID Students.StudentID%TYPE;
+v_stdName Students.StudentName%TYPE;
+v_stdAddress Students.StudentAddress%TYPE;
+v_stdGender Students.StudentGender%TYPE;
+v_stdDOB Students.DateOfBirth%TYPE;
+
+ v_bookName Book.BookName%TYPE;
+ v_borrowDate BorrowRecord.DateBorrowed%TYPE;
+ v_returnDate ReturnRecord.DateReturned%TYPE;
+
+v_totalBorrowed NUMBER;
+v_totalBooked NUMBER;
+
+v_Room Facility.Room%TYPE;
+v_facType FacilityType.FacilityTypeName%TYPE;
+v_DateBook FacilityBookingRecord.DateBooked%TYPE;
+v_dateCheckout FacilityBookingRecord.DateCheckout%TYPE;
+
+CURSOR STD_DETAILS IS
+SELECT  StudentID, StudentName, StudentAddress, StudentGender, DateOfBirth
+FROM Students
+WHERE StudentID = v_stdID;
+
+CURSOR BOOKBORROWED_TOTAL IS
+SELECT COUNT(brr.BorrowRecordID)
+FROM Students std, BorrowRecord brr
+WHERE std.StudentID = v_stdID
+AND std.StudentID = brr.StudentID;
+
+CURSOR FACBOOK_TOTAL IS
+SELECT COUNT(fbr.FacilityBookingRecordID)
+FROM Students std, FacilityBookingRecord fbr
+WHERE std.StudentID = v_stdID
+AND std.StudentID = fbr.StudentID;
+
+CURSOR BOOKBORROWED_DETAIL IS
+SELECT bok.BookName, brr.DateBorrowed, rtr.DateReturned
+FROM Students std, Book bok, BorrowRecord brr, BorrowDetails bds, ReturnRecord rtr
+WHERE std.StudentID = v_stdID
+AND std.StudentID = brr.StudentID 
+AND brr.BorrowRecordID = bds.BorrowRecordID
+AND bds.BookID = bok.BookID
+AND brr.BorrowRecordID = rtr.BorrowRecordID;
+
+CURSOR FACBOOK_DETAIL IS
+SELECT fac.Room, Fct.FacilityTypeName, fbr.DateBooked, fbr.DateCheckout
+FROM Facility fac, FacilityType fct, Students std, FacilityBookingRecord fbr
+WHERE std.StudentID = v_stdID
+AND std.StudentID = fbr.StudentID
+AND fbr.FacilityID = fac.FacilityID 
+AND fac.FacilityTypeID = fct.FacilityTypeID;
+
+BEGIN
+
+DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+DBMS_OUTPUT.PUT_LINE('--------------STUDENT Details--------------');
+DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+DBMS_OUTPUT.PUT_LINE(CHR(7)); 
+
+OPEN STD_DETAILS;
+LOOP 
+    FETCH STD_DETAILS INTO
+        v_studentID, v_stdName, v_stdAddress, v_stdGender,v_stdDOB;
+    EXIT WHEN STD_DETAILS%NOTFOUND;
+
+    DBMS_OUTPUT.PUT_LINE('STUDENT ID : '||v_studentID);
+    DBMS_OUTPUT.PUT_LINE('NAME : '||v_stdName);
+    DBMS_OUTPUT.PUT_LINE('ADDRESS : '||v_stdAddress);
+    DBMS_OUTPUT.PUT_LINE('GENDER: '||v_stdGender);
+    DBMS_OUTPUT.PUT_LINE('DATE OF BIRTH : '||v_stdDOB);
+
+    OPEN BOOKBORROWED_TOTAL;
+    LOOP
+        FETCH BOOKBORROWED_TOTAL INTO
+            v_totalBorrowed;
+        EXIT WHEN BOOKBORROWED_TOTAL%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE(CHR(10)); 
+        DBMS_OUTPUT.PUT_LINE('TOTAL BOOK BORROWED : '||v_totalBorrowed);
+    END LOOP;
+
+        OPEN BOOKBORROWED_DETAIL;
+        DBMS_OUTPUT.PUT_LINE('---------- Borrowed History ----------');
+        LOOP
+            FETCH BOOKBORROWED_DETAIL INTO
+                v_bookName, v_borrowDate, v_returnDate;
+            EXIT WHEN BOOKBORROWED_DETAIL%NOTFOUND;
+                DBMS_OUTPUT.PUT_LINE('BOOK NAME : '||v_bookName);
+                DBMS_OUTPUT.PUT_LINE('BORROW DATE : '||v_borrowDate);
+                DBMS_OUTPUT.PUT_LINE('RETURN DATE : '||v_returnDate);
+                DBMS_OUTPUT.PUT_LINE('------------------------------------------------');
+            END LOOP;
+        CLOSE BOOKBORROWED_DETAIL;
+
+    CLOSE BOOKBORROWED_TOTAL;
+
+    OPEN FACBOOK_TOTAL;
+    LOOP
+        FETCH FACBOOK_TOTAL INTO
+        v_totalBooked;
+        EXIT WHEN FACBOOK_TOTAL%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE(CHR(10)); 
+        DBMS_OUTPUT.PUT_LINE('TOTAL FACILITY BOOKED : '||v_totalBooked);   
+    END LOOP;
+
+        OPEN FACBOOK_DETAIL;
+            DBMS_OUTPUT.PUT_LINE('---------- Facility Booked History ----------');
+            LOOP
+                FETCH FACBOOK_DETAIL INTO
+                    v_room, v_facType, v_DateBook, v_dateCheckout;
+                EXIT WHEN FACBOOK_DETAIL%NOTFOUND;
+                DBMS_OUTPUT.PUT_LINE('ROOM : '||v_room);
+                DBMS_OUTPUT.PUT_LINE('FACILITY TYPE : '||v_facType);
+                DBMS_OUTPUT.PUT_LINE('BOOKED DATE : '||v_DateBook);
+                DBMS_OUTPUT.PUT_LINE('CHECKOUT DATE : '||v_dateCheckout);
+                DBMS_OUTPUT.PUT_LINE('------------------------------------------------');
+            END LOOP;
+        CLOSE FACBOOK_DETAIL;
+
+    CLOSE FACBOOK_TOTAL;
+
+
+END LOOP;
+CLOSE STD_DETAILS;
+
+END;
+/

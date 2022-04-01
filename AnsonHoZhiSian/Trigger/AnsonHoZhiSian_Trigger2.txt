@@ -1,0 +1,68 @@
+create table Book_AuditDetail
+(
+BookID char(7),
+BookName varchar(30),
+Action varchar(15),
+AddUpdDelAt DATE,
+HandledBy varchar(20)
+);
+
+create table Book_Audit
+(
+TodayDate Date,
+No_of_Insert Number,
+No_of_Updated NUMBER,
+LastUpdated TIMESTAMP,
+Last_Handled varchar2(30)
+);
+
+CREATE OR REPLACE TRIGGER TRACK_BOOKS
+AFTER INSERT OR UPDATE OF BookName ON BOOK
+FOR EACH ROW
+DECLARE
+
+v_date date;
+
+BEGIN
+
+CASE
+
+WHEN INSERTING THEN
+INSERT INTO Book_AuditDetail VALUES (:new.BookID,:new.BookName,'INSERT', CURRENT_TIMESTAMP, USER);
+
+WHEN UPDATING THEN
+INSERT INTO Book_AuditDetail VALUES (:new.BookID, :new.BookName,'UPDATE', CURRENT_TIMESTAMP, USER);
+END CASE;
+
+SELECT TodayDate INTO v_date
+from Book_Audit
+WHERE to_char(TodayDate,'DD-MON-YY') = to_char(SYSDATE,'DD-MON-YY');
+
+IF SQL%FOUND THEN
+CASE
+WHEN INSERTING THEN
+UPDATE Book_Audit
+SET No_of_Insert = No_of_Insert + 1,
+LastUpdated = CURRENT_TIMESTAMP,
+Last_Handled = USER
+WHERE to_char(TodayDate,'DD-MON-YY') = to_char(SYSDATE,'DD-MON-YY');
+
+WHEN UPDATING THEN
+UPDATE Book_Audit
+SET No_of_Updated = No_of_Updated + 1,
+LastUpdated = CURRENT_TIMESTAMP,
+Last_Handled = USER
+WHERE to_char(TodayDate,'DD-MON-YY') = to_char(SYSDATE,'DD-MON-YY');
+END CASE;
+END IF;
+
+EXCEPTION 
+WHEN NO_DATA_FOUND THEN
+CASE
+WHEN INSERTING THEN
+INSERT INTO Book_Audit VALUES (SYSDATE, 1, 0, CURRENT_TIMESTAMP, USER);
+WHEN UPDATING THEN
+INSERT INTO Book_Audit VALUES (SYSDATE, 0, 1, CURRENT_TIMESTAMP, USER);
+END CASE;
+END;
+/

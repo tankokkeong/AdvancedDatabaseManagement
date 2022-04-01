@@ -1,0 +1,58 @@
+create table librarians_allowance
+(
+LibrarianID char(12),
+basicAllowance Number(7,2) Default 0.00,
+workingHours Number,
+totalAllowance NUMBER(7,2) Default 0.00,
+ExtraAllowanceRate Number(7,2) Default 0.00,
+finalTotalAllowance Number(7,2) Default 0.00
+);
+
+CREATE OR REPLACE TRIGGER TRG_UPT_LIBRARIANS_ALLOWANCE
+AFTER UPDATE OF WorkingHours ON Librarians
+For Each Row
+Declare
+
+v_WorkingHours NUMBER;
+v_basicAllowance NUMBER(7,2) := 7.00;
+v_totalAllowance NUMBER(7,2) := 0.00;
+v_extraAllowanceRate NUMBER(7,2) := 0.00;
+v_finalTotalAllowance NUMBER(7,2) := 0.00;
+
+v_librarianID LIBRARIANS.LIBRARIANID%TYPE;
+
+Begin
+
+IF :new.WorkingHours >= 4 AND :new.WorkingHours <= 7 THEN
+v_totalAllowance := v_basicAllowance * :new.WorkingHours;
+v_extraAllowanceRate := ROUND(1.50,2);
+v_finalTotalAllowance := v_totalAllowance * v_extraAllowanceRate;
+
+ELSIF :new.WorkingHours >= 8 AND :new.WorkingHours <= 10 THEN
+v_totalAllowance := v_basicAllowance * :new.WorkingHours;
+v_extraAllowanceRate := 2.00;
+v_finalTotalAllowance := v_totalAllowance * v_extraAllowanceRate;
+
+ELSIF :new.WorkingHours >= 11 AND :new.WorkingHours <= 12 THEN
+v_totalAllowance := v_basicAllowance * :new.WorkingHours;
+v_extraAllowanceRate := 2.50;
+v_finalTotalAllowance := v_totalAllowance * v_extraAllowanceRate;
+END IF;
+
+Select LibrarianID into v_librarianID from librarians_allowance
+where LibrarianID = :new.LibrarianID;
+
+IF SQL%FOUND THEN
+ 
+Update librarians_allowance
+Set LibrarianID = :new.LibrarianID,basicAllowance = v_basicAllowance,workingHours = :new.WorkingHours,totalAllowance = v_totalAllowance, ExtraAllowanceRate = v_extraAllowanceRate,finalTotalAllowance = v_finalTotalAllowance;
+
+END IF;
+
+Exception
+When NO_DATA_FOUND THEN
+
+INSERT INTO librarians_allowance values (:new.LibrarianID, v_basicAllowance, :new.WorkingHours, v_totalAllowance, v_extraAllowanceRate, v_finalTotalAllowance);
+
+END;
+/

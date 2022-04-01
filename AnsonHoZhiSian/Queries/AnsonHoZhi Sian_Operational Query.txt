@@ -1,0 +1,39 @@
+/*Operational Query - To find out a specific category of books that are borrowed by the students under a specific date. To check a specific category of books that are borrowed by the students under a specific range of date.*/
+
+--Formating
+break on bookcategoryname skip 1
+SET linesize 800
+SET pagesize 50
+
+ALTER SESSION SET NLS_DATE_FORMAT = 'DD-MON-YYYY';
+
+
+SELECT * FROM BookCategory;
+
+COLUMN BookCategoryName FORMAT A30 HEADING "Book Category Name"
+COLUMN BookName FORMAT A30 HEADING "Book Name"
+COLUMN StudentName FORMAT A30 HEADING "Borrowed By"
+COLUMN DateBorrowed FORMAT A13 HEADING "Date Borrowed"
+
+TTITLE LEFT 'Book Category Borrowed By Students'
+
+ACCEPT book_cat CHAR FORMAT 'A50' PROMPT 'Book Category Name: '
+ACCEPT start_date DATE FORMAT'DD-MON-YYYY' PROMPT 'Enter Start Date(EXP: 01-JUL-2020): '
+ACCEPT to_date DATE FORMAT'DD-MON-YYYY' PROMPT 'Enter End Date(EXP: 30-JUL-2020):'
+
+
+
+SELECT bct.BookCategoryName, bok.BookName, std.StudentName, brr.DateBorrowed
+FROM BookCategory bct, Students std, BorrowRecord brr, BorrowDetails bds, Book bok
+WHERE bct.BookCategoryName LIKE '&book_cat'
+AND (SELECT BookCategoryID FROM BookCategory WHERE BookCategoryName LIKE '&book_cat') = bok.BookCategoryID
+AND bok.BookID = bds.BookID
+AND bds.BorrowRecordID = brr.BorrowRecordID
+AND brr.StudentID = std.StudentID
+AND brr.DateBorrowed BETWEEN '&start_date' AND '&to_date'
+Order By brr.DateBorrowed;
+
+-- Clear Formatting
+CLEAR COLUMNS
+TTITLE OFF
+

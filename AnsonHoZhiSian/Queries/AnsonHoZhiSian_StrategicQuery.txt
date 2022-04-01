@@ -1,0 +1,30 @@
+-- Formatting
+SET linesize 300
+SET pagesize 50
+
+COLUMN borrowRank FORMAT 99 HEADING "Ranking"
+COLUMN BookCategoryName FORMAT A30 HEADING "Book Name"
+COLUMN TotalBooksBorrowed FORMAT 9999 HEADING "Total Books Borrowed"
+COLUMN Percentage FORMAT 999.99 HEADING "Percentage (%)"
+
+TTITLE LEFT 'Book Categories Popularity' SKIP 2
+
+ACCEPT year CHAR FORMAT 'A5' PROMPT 'Enter a year: '
+
+SELECT RANK() OVER (ORDER BY COUNT(bds.BorrowDetailsID) DESC) borrowRank, bkc.BookCategoryName, COUNT(bds.BorrowDetailsID) AS TotalBooksBorrowed,
+ROUND((COUNT(bds.BorrowDetailsID) * 100 / (select COUNT(bok.BookID) from
+Book bok,  BorrowDetails bds, BorrowRecord brr
+WHERE bok.BookID = bds.BookID
+AND bds.BorrowRecordID = brr.BorrowRecordID
+AND EXTRACT(year FROM brr.DateBorrowed) = '&year')), 2) AS Percentage
+FROM BookCategory bkc, Book bok, BorrowDetails bds, BorrowRecord brr
+WHERE bkc.BookCategoryID = bok.bookCategoryID
+AND bok.BookID = bds.BookID
+AND bds.BorrowRecordID = brr.BorrowRecordID
+AND EXTRACT(year FROM brr.DateBorrowed) = '&year'
+Group By BookCategoryName
+Order by borrowRank;
+
+-- Clear Formatting
+CLEAR COLUMNS
+TTITLE OFF

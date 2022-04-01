@@ -1,0 +1,41 @@
+CREATE TABLE LIBRARIAN_AUDIT
+(
+IN_LIBRARIAN_ID CHAR(16),
+IN_LIBRARIAN_NAME VARCHAR2(30),
+IN_WORKING_HOURS NUMBER,
+IN_PROVIDE_EXTRA VARCHAR2(16),
+CHECKED_BY VARCHAR2(30),
+CHECKED_AT DATE
+);
+
+
+CREATE OR REPLACE PROCEDURE PRC_LIBR_WH (IN_LIBRARIAN_ID IN CHAR) AS
+
+v_librarian_name varchar2(50);
+v_working_hours Number(4);
+v_extra_working varchar(20);
+
+BEGIN
+select LibrarianName , WorkingHours into v_librarian_name, v_working_hours
+FROM Librarians
+where LibrarianID = IN_LIBRARIAN_ID;
+
+IF v_working_hours = 4 THEN 
+v_extra_working := 'Yes';
+INSERT INTO LIBRARIAN_AUDIT VALUES (IN_LIBRARIAN_ID, v_librarian_name, v_working_hours, v_extra_working, USER, SYSDATE);
+DBMS_OUTPUT.PUT_LINE('Librarian Name: '||v_librarian_name);
+DBMS_OUTPUT.PUT_LINE('Working Hours '||v_working_hours);
+DBMS_OUTPUT.PUT_LINE('It just reached the minimum working hours. May plan to provide more duty hours to he/she');
+ELSIF v_working_hours > 4 THEN
+v_extra_working := 'No';
+INSERT INTO LIBRARIAN_AUDIT VALUES (IN_LIBRARIAN_ID, v_librarian_name, v_working_hours, v_extra_working, USER, SYSDATE);
+DBMS_OUTPUT.PUT_LINE('Librarian Name: '||v_librarian_name);
+DBMS_OUTPUT.PUT_LINE('Working Hours '||v_working_hours);
+DBMS_OUTPUT.PUT_LINE('It is more than minimum duty hours.');
+
+END IF;
+
+END;
+/
+
+--insert into Librarians values ('LIB1001','Anson Ho', 6, 0, 0, 0, 0);

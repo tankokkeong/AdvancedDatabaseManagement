@@ -1,0 +1,80 @@
+SET SERVEROUTPUT ON
+
+CREATE OR REPLACE PROCEDURE prc_stdlec_mostborrow (v_month IN VARCHAR, v_year NUMBEr) IS
+
+v_stdBookName Book.BookName%TYPE;
+v_stdBookType BookCategory.BookCategoryName%TYPE;
+v_stdBookQuantity NUMBER;
+
+v_lecBookName Book.BookName%TYPE;
+v_lecBookType BookCategory.BookCategoryName%TYPE;
+v_lecBookQuantity NUMBER;
+
+CURSOR STD_BOOKBORROW IS
+SELECT * FROM
+(
+    SELECT bok.BookName, bct.BookCategoryName, COUNT(bok.BookID) TOTALBORROWED
+    FROM Book bok, BookCategory bct, BorrowDetails bds, BorrowRecord brr, Students std
+    WHERE std.StudentID = brr.StudentID
+    AND brr.BorrowRecordID = bds.BorrowRecordID
+    AND bds.BookID = bok.BookID
+    AND bok.bookCategoryID = bct.bookCategoryID
+    AND TO_CHAR(brr.DateBorrowed , 'MON' ) = v_month
+    AND EXTRACT(year from brr.DateBorrowed) = v_year
+    Group by bok.BookName, bct.BookCategoryName
+    Order By TotalBorrowed DESC
+
+) WHERE ROWNUM <= 5;
+
+CURSOR LEC_BOOKBORROW IS
+SELECT * FROM 
+(
+    SELECT bok.BookName, bct.BookCategoryName, COUNT(bok.BookID) TOTALBORROWED
+    FROM Book bok, BookCategory bct, BorrowDetails bds, BorrowRecord brr, Lecturers lec
+    WHERE lec.LecturerID = brr.LecturerID
+    AND brr.BorrowRecordID = bds.BorrowRecordID
+    AND bds.BookID = bok.BookID
+    AND bok.bookCategoryID = bct.bookCategoryID
+    AND EXTRACT(month from brr.DateBorrowed) = 4
+    AND EXTRACT(year from brr.DateBorrowed) = 2021
+    Group by bok.BookName, bct.BookCategoryName
+    Order By TotalBorrowed DESC
+)WHERE ROWNUM <= 5;
+
+BEGIN 
+
+DBMS_OUTPUT.PUT_LINE('----------------------------------------------------');
+DBMS_OUTPUT.PUT_LINE('-------- Top 5 Borrowed Books in '||v_month||' '||v_year||' ----------');
+DBMS_OUTPUT.PUT_LINE('----------------------------------------------------');
+DBMS_OUTPUT.PUT_LINE(CHR(7)); 
+
+OPEN STD_BOOKBORROW;
+DBMS_OUTPUT.PUT_LINE('------------ TOP 5 BORROWED BOOK IN STUDENT ------------');
+LOOP
+    FETCH STD_BOOKBORROW INTO   
+        v_stdBookName, v_stdBookType, v_stdBookQuantity;
+    EXIT WHEN STD_BOOKBORROW%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('BOOK NAME : '||v_stdBookName);
+        DBMS_OUTPUT.PUT_LINE('BOOK CATEGORY : '||v_stdBookType);
+        DBMS_OUTPUT.PUT_LINE('TOTAL BORROWED BY STUDENTS : '||v_stdBookQuantity);
+        DBMS_OUTPUT.PUT_LINE('------------------------------------------------');
+END LOOP;
+CLOSE STD_BOOKBORROW;
+
+
+OPEN LEC_BOOKBORROW;
+DBMS_OUTPUT.PUT_LINE(CHR(10));
+DBMS_OUTPUT.PUT_LINE('-------- TOP 5 BORROWED BOOK IN LECTURER --------');
+LOOP
+    FETCH LEC_BOOKBORROW INTO   
+        v_lecBookName, v_lecBookType, v_lecBookQuantity;
+    EXIT WHEN LEC_BOOKBORROW%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('BOOK NAME : '||v_lecBookName);
+        DBMS_OUTPUT.PUT_LINE('BOOK CATEGORY : '||v_lecBookType);
+        DBMS_OUTPUT.PUT_LINE('TOTAL BORROWED BY LECTURERS : '||v_lecBookQuantity);
+        DBMS_OUTPUT.PUT_LINE('------------------------------------------------');
+END LOOP;
+CLOSE LEC_BOOKBORROW;
+
+END;
+/
